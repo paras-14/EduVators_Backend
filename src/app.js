@@ -3,6 +3,7 @@ const cors = require('cors')
 const config = require('./config/config')
 const morgan = require("./config/morgan");
 const {userAuthRoute} = require('./api/routes');
+const {globalErrorHandler} = require("./api/middlewares")
 
 const appLoader = async(app)=>{
     app.get('/',(req,res)=>{
@@ -27,6 +28,9 @@ const appLoader = async(app)=>{
 
 
     app.use(userAuthRoute)
+
+
+    app.use(globalErrorHandler)
 
 }
 
