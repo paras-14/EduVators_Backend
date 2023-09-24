@@ -2,7 +2,7 @@ const express = require('express')
 const cors = require('cors')
 const config = require('./config/config')
 const morgan = require("./config/morgan");
-const {userAuthRoute} = require('./api/routes');
+const {userAuthRoute,authRoute} = require('./api/routes');
 const {globalErrorHandler} = require("./api/middlewares")
 
 const appLoader = async(app)=>{
@@ -27,7 +27,8 @@ const appLoader = async(app)=>{
     app.use(express.urlencoded({ extended: true }));
 
 
-    app.use(userAuthRoute)
+    app.use(userAuthRoute);
+    app.use('/api/auth',authRoute);
 
 
     app.use(globalErrorHandler)
