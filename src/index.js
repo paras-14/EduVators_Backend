@@ -7,8 +7,8 @@ const appLoader=require("./app")
 
 async function startServer(){
     const app = express();
-    await connectDB()
     await appLoader(app)
+    await connectDB()
 
     const server = app.listen(config.port, () => {
         logger.info(`Server up on port ${config.port}`);
