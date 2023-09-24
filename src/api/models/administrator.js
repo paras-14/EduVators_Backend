@@ -3,41 +3,29 @@ const mongoose = require('mongoose')
 const adminSchema = new mongoose.Schema(
   {
     name: {
-      type: String,
-      required: true
+      type: String
     },
     email: {
-      type: String,
-      required: true
+      type: String
     },
     phone: {
-      type: Number,
-      required: true,
+      type: Number
     },
     gender: {
-      type: String,
-      required: true
+      type: String
     },
     role: {
       type: String,
-      required: true,
       default: "admin"
     },
     school_name: {
-      type: String,
-      required: true,
+      type: String
     },
     uid: {
-      type: String,
-      required: true,
+      type: String
     },
     password: {
-      type: String,
-      required: true,
-    },
-    files: {
-      type: String,
-      required: true
+      type: String
     }
   },
   {

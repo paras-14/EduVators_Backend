@@ -17,10 +17,6 @@ const schoolAuthSchema = new mongoose.Schema(
     address: {
         type: String,
         required: true
-    },
-    files: {
-        type: String,
-        required: true
     }
   },
   {

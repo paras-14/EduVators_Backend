@@ -10,6 +10,8 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { StatusCodes } = require('http-status-codes');
 
+const sendEmails=require("../helpers/Nodemailer");
+
 const signup = async (req, res) => {
     const { role } = req.body;
     if (role === "admin") {
@@ -23,7 +25,7 @@ const signup = async (req, res) => {
             }
             const encryptedPassword = await bcrypt.hash(password, 10);
             const registerSchool = await schoolAuthmodel.create({
-                school_name,
+                name: school_name,
                 sid,
                 email,
                 address
@@ -34,7 +36,7 @@ const signup = async (req, res) => {
                 phone,
                 gender,
                 school_name,
-                uid: email,
+                uid: sid,
                 password: encryptedPassword
             })
             await registerSchool.save();
@@ -93,10 +95,12 @@ const registerTeachers = async (req, res) => {
                 email,
                 school_name,
                 uid,
-                batches,
+                batches, 
                 subject,
                 password: encryptedPassword,
             })
+
+            sendEmails({email,uid,school_name});
             await register.save();
 
         } catch (error) {
@@ -122,12 +126,12 @@ const registerTeachers = async (req, res) => {
 
 const registerStudents = async (req, res) => {
 
-    const { school_name, batch, courses, start, end } = req.body;
+    const { school_name, batch, courses, range } = req.body;
 
 
-    const registerStudents = async (num, school_name, batch) => {
+    const registerStudent = async (num, school_name, batch) => {
         const pass = `${batch}` + num;
-        try {
+        
             const encryptedPassword = await bcrypt.hash(pass, 10);
             const register = await studentAuthModel.create({
                 uid: pass,
@@ -136,12 +140,6 @@ const registerStudents = async (req, res) => {
                 password: encryptedPassword,
             })
             await register.save();
-
-        } catch (error) {
-            res.status(500).json({
-                error: error,
-            })
-        }
     }
 
     try {
@@ -152,13 +150,13 @@ const registerStudents = async (req, res) => {
         })
         await registerbatch.save();
 
-        for (let i = start; i <= end; i++) {
-            await registerStudents(i, school_name, batch);
-            res.status(200).json({
-                status: "ok",
-                data: "All students are created with their user id and password as their given id. with their class as their suffix. Please fill all other details by signing in and change the password!",
-            })
+        for (let i = range.start; i <= range.end; i++) {
+            await registerStudent(i, school_name, batch);
         }
+        res.status(200).json({
+            status: "ok",
+            data: "All students are created with their user id and password as their given id. with their class as their suffix. Please fill all other details by signing in and change the password!",
+        })
     } catch (error) {
         res.status(500).json({
             error: error,
@@ -191,7 +189,7 @@ const login = async (req, res) => {
     }
 
     if (await bcrypt.compare(password, oldUser.password)) {
-        const token = jwt.sign({ email: oldUser.email, username: oldUser.username }, process.env.JWT_SECRET)
+        const token = jwt.sign({ email: oldUser.email, username: oldUser.uid }, process.env.JWT_SECRET)
         if (res.status(201)) {
             return res.status(200).json({ status: "ok", data: token })
         } else {

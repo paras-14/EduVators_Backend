@@ -32,9 +32,6 @@ const freelancerAuthSchema = new mongoose.Schema(
     password: {
       type: String,
       required: true
-    },
-    file: {
-        type: String
     }
   },
   {
